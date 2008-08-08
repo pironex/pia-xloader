@@ -66,6 +66,8 @@ void start_armboot (void)
 		}
 	}
 
+	misc_init_r();
+
 	buf =  (uchar*) CFG_LOADADDR;
 
 #ifdef CONFIG_MMC
