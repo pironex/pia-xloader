@@ -245,6 +245,8 @@ u32 get_sdr_cs_size(u32 offset)
  *********************************************************************/
 void config_3430sdram_ddr(void)
 {
+	
+#ifndef CONFIG_DDR_256MB_STACKED 
 	/* reset sdrc controller */
 	__raw_writel(SOFTRESET, SDRC_SYSCONFIG);
 	wait_on_value(BIT0, BIT0, SDRC_STATUS, 12000000);
@@ -282,6 +284,57 @@ void config_3430sdram_ddr(void)
 	/* set up dll */
 	__raw_writel(SDP_SDRC_DLLAB_CTRL, SDRC_DLLA_CTRL);
 	delay(0x2000);	/* give time to lock */
+#else
+       /* reset sdrc controller */
+         __raw_writel(SOFTRESET, SDRC_SYSCONFIG);
+         wait_on_value(BIT0, BIT0, SDRC_STATUS, 12000000);
+         __raw_writel(0, SDRC_SYSCONFIG);
+ 
+         /* setup sdrc to ball mux */
+         __raw_writel(SDP_SDRC_SHARING, SDRC_SHARING);
+ 
+         /* SDRC put in weak */
+ //        (*(unsigned int*)0x6D00008C) = 0x00000020;
+ 
+         /* SDRC_MCFG0 register */
+         (*(unsigned int*)0x6D000080) = 0x02584099;//from Micron
+ 
+         /* SDRC_ACTIM_CTRLA0 register */
+ //our value        (*(unsigned int*)0x6D00009c) = 0xa29db4c6;// for 166M
+         (*(unsigned int*)0x6D00009c) = 0xaa9db4c6;// for 166M from rkw
+ 
+         /* SDRC_ACTIM_CTRLB0 register */
+ //from micron   (*(unsigned int*)0x6D0000a0) = 0x12214;// for 166M
+ 
+ //        (*(unsigned int*)0x6D0000a0) = 0x00011417; our value
+         (*(unsigned int*)0x6D0000a0) = 0x00011517;
+ 
+         /* SDRC_RFR_CTRL0 register */
+ //from micron   (*(unsigned int*)0x6D0000a4) =0x54601; // for 166M
+ 
+         (*(unsigned int*)0x6D0000a4) =0x0004DC01;
+ 
+         /* Disble Power Down of CKE cuz of 1 CKE on combo part */
+         (*(unsigned int*)0x6D000070) = 0x00000081;
+ 
+         /* SDRC_Manual command register */
+         (*(unsigned int*)0x6D0000a8) = 0x00000000; // NOP command
+         delay(5000);
+         (*(unsigned int*)0x6D0000a8) = 0x00000001; // Precharge command
+         (*(unsigned int*)0x6D0000a8) = 0x00000002; // Auto-refresh command
+         (*(unsigned int*)0x6D0000a8) = 0x00000002; // Auto-refresh command
+ 
+         /* SDRC MR0 register */
+         (*(int*)0x6D000084) = 0x00000032; // Burst length =4
+         // CAS latency = 3
+         // Write Burst = Read Burst
+         // Serial Mode
+ 
+         /* SDRC DLLA control register */
+         (*(unsigned int*)0x6D000060) = 0x0000A;
+         delay(0x20000); // some delay
+
+#endif
 
 #ifdef CONFIG_DDR_256MB_STACKED
 	make_cs1_contiguous();

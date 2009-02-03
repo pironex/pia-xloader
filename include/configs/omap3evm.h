@@ -70,6 +70,7 @@
 
 /* Memory type */
 #define CFG_OMAPEVM_DDR		1
+#define CFG_3430SDRAM_DDR	1
 #define CONFIG_DDR_256MB_STACKED
 
 /* The actual register values are defined in u-boot- mem.h */
