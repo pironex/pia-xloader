@@ -69,7 +69,8 @@
 #define PRCM_PCLK_OPP2           1    /* ARM=381MHz - VDD1=1.20v */
 
 /* Memory type */
-#define CFG_3430SDRAM_DDR        1
+#define CFG_OMAPEVM_DDR		1
+#define CONFIG_DDR_256MB_STACKED
 
 /* The actual register values are defined in u-boot- mem.h */
 /* SDRAM Bank Allocation method */

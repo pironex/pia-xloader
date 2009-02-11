@@ -206,7 +206,40 @@ u32 wait_on_value(u32 read_bit_mask, u32 match_value, u32 read_addr, u32 bound)
 	} while (1);
 }
 
-#ifdef CFG_3430SDRAM_DDR
+#ifdef CFG_OMAPEVM_DDR
+#ifdef CONFIG_DDR_256MB_STACKED
+/**************************************************************************
+ * make_cs1_contiguous() - for es2 and above remap cs1 behind cs0 to allow
+ *  command line mem=xyz use all memory with out discontinuous support
+ *  compiled in.  Could do it at the ATAG, but there really is two banks...
+ * Called as part of 2nd phase DDR init.
+ **************************************************************************/
+void make_cs1_contiguous(void)
+{
+	u32 size, a_add_low, a_add_high;
+
+	size = get_sdr_cs_size(SDRC_CS0_OSET);
+	size /= SZ_32M;         /* find size to offset CS1 */
+	a_add_high = (size & 3) << 8;   /* set up low field */
+	a_add_low = (size & 0x3C) >> 2; /* set up high field */
+	__raw_writel((a_add_high | a_add_low), SDRC_CS_CFG);
+}
+
+/***********************************************************************
+ * get_cs0_size() - get size of chip select 0/1
+ ************************************************************************/
+u32 get_sdr_cs_size(u32 offset)
+{
+	u32 size;
+
+	/* get ram size field */
+	size = __raw_readl(SDRC_MCFG_0 + offset) >> 8;
+	size &= 0x3FF;          /* remove unwanted bits */
+	size *= SZ_2M;          /* find size in MB */
+	return size;
+}
+#endif
+
 /*********************************************************************
  * config_3430sdram_ddr() - Init DDR on 3430SDP dev board.
  *********************************************************************/
@@ -250,8 +283,24 @@ void config_3430sdram_ddr(void)
 	__raw_writel(SDP_SDRC_DLLAB_CTRL, SDRC_DLLA_CTRL);
 	delay(0x2000);	/* give time to lock */
 
+#ifdef CONFIG_DDR_256MB_STACKED
+	make_cs1_contiguous();
+
+	__raw_writel(SDP_SDRC_MDCFG_0_DDR, SDRC_MCFG_0 + SDRC_CS1_OSET);
+	__raw_writel(MICRON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_1);
+	__raw_writel(MICRON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_1);
+
+	__raw_writel(SDP_SDRC_RFR_CTRL, SDRC_RFR_CTRL + SDRC_CS1_OSET);
+	/* init sequence for mDDR/mSDR using manual commands */
+	__raw_writel(CMD_NOP, SDRC_MANUAL_0 + SDRC_CS1_OSET);
+	delay(5000);   /* supposed to be 100us per design spec for mddr/msdr */
+	__raw_writel(CMD_PRECHARGE, SDRC_MANUAL_0 + SDRC_CS1_OSET);
+	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0 + SDRC_CS1_OSET);
+	__raw_writel(CMD_AUTOREFRESH, SDRC_MANUAL_0 + SDRC_CS1_OSET);
+	__raw_writel(SDP_SDRC_MR_0_DDR, SDRC_MR_0 + SDRC_CS1_OSET);
+#endif
 }
-#endif // CFG_3430SDRAM_DDR
+#endif /* CFG_OMAPEVM_DDR */
 
 /*************************************************************
  * get_sys_clk_speed - determine reference oscillator speed
