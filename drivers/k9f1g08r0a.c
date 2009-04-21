@@ -79,7 +79,6 @@ static u_char ecc_pos[] =
 		{40, 41, 42, 43, 44, 45, 46, 47,
 		48, 49, 50, 51, 52, 53, 54, 55,
 		56, 57, 58, 59, 60, 61, 62, 63};
-static u_char eccvalid_pos = 4;
 
 static unsigned long chipsize = (256 << 20);
 
@@ -200,7 +199,8 @@ int nand_read_block(unsigned char *buf, ulong block_addr)
  	
 	/* check bad block */
 	/* 0th word in spare area needs be 0xff */
-	if (nand_read_oob(oob_buf, block_addr) || (oob_buf[0] & 0xff) != 0xff){
+	if (nand_read_oob((unsigned char *)oob_buf, block_addr)
+		|| (oob_buf[0] & 0xff) != 0xff) {
 		printf("Skipped bad block at 0x%x\n", block_addr);
 		return 1;    /* skip bad block */
 	}
@@ -214,7 +214,7 @@ int nand_read_block(unsigned char *buf, ulong block_addr)
 
 	return 0;
 }
-static count = 0;
+static int count;
 /* read a page with ECC */
 static int nand_read_page(u_char *buf, ulong page_addr)
 {
@@ -242,14 +242,14 @@ static int nand_read_page(u_char *buf, ulong page_addr)
 	/* A delay seems to be helping here. needs more investigation */
 	delay(10000);
 	len = (bus_width == 16) ? PAGE_SIZE >> 1 : PAGE_SIZE;
-	p = buf;
+	p = (u16 *)buf;
 	for (cntr = 0; cntr < len; cntr++){
 		*p++ = READ_NAND(NAND_ADDR);
 		delay(10);
    	}
 	
 #ifdef ECC_CHECK_ENABLE
-	p = oob_buf;
+	p = (u16 *)oob_buf;
         len = (bus_width == 16) ? OOB_SIZE >> 1 : OOB_SIZE;
 	for (cntr = 0; cntr < len; cntr++){
 		*p++ = READ_NAND(NAND_ADDR);
@@ -283,7 +283,6 @@ static int nand_read_page(u_char *buf, ulong page_addr)
  */
 static int nand_read_oob(u_char *buf, ulong page_addr)
 {
-	u16 val;
 	int cntr;
 	int len;
 
@@ -292,7 +291,7 @@ static int nand_read_oob(u_char *buf, ulong page_addr)
 #else
 	u_char *p;
 #endif
-	p = buf;
+	p = (u16 *)buf;
         len = (bus_width == 16) ? OOB_SIZE >> 1 : OOB_SIZE;
 
   	NAND_ENABLE_CE();  /* set pin low */

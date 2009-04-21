@@ -107,7 +107,6 @@ unsigned char mmc_clock_config(unsigned int iclk, unsigned short clk_div)
 unsigned char mmc_init_setup(void)
 {
 	unsigned int reg_val;
-	unsigned int val = 0;
 
 	mmc_board_init();
 
@@ -500,8 +499,10 @@ unsigned char configure_mmc(mmc_card_data *mmc_card_cur)
 
 unsigned long mmc_bread(int dev_num, ulong blknr, ulong blkcnt, ulong *dst)
 {
-	omap_mmc_read_sect(blknr, (blkcnt * MMCSD_SECTOR_SIZE), &cur_card_data,
-			   (unsigned long *)dst);
+	unsigned long ret;
+	ret = omap_mmc_read_sect(blknr, (blkcnt * MMCSD_SECTOR_SIZE),
+			&cur_card_data, (unsigned int *)dst);
+	return ret;
 }
 
 int mmc_init(int verbose)
@@ -534,12 +535,14 @@ int mmc_read(unsigned int src, unsigned char *dst, int size)
 	/*
 	 * NOT Implemented
 	 */
+	return 0;
 }
 int mmc_write(unsigned char *src, unsigned long dst, int size)
 {
 	/*
 	 * NOT Implemented
 	 */
+	return 0;
 }
 
 int mmc2info(unsigned int addr)
@@ -547,6 +550,7 @@ int mmc2info(unsigned int addr)
 	/*
 	 * NOT Implemented
 	 */
+	return 0;
 }
 #endif
 

@@ -257,10 +257,9 @@ get_fatent(fsdata *mydata, __u32 entry)
 	/* Read a new block of FAT entries into the cache. */
 	if (bufnum != mydata->fatbufnum) {
 		int getsize = FATBUFSIZE/FS_BLOCK_SIZE;
-		__u8 *bufptr = mydata->fatbuf;
+		__u8 *bufptr = (__u8 *)mydata->fatbuf;
 		__u32 fatlength = mydata->fatlength;
 		__u32 startblock = bufnum * FATBUFBLOCKS;
-		unsigned long i;
 
 		fatlength *= SECTOR_SIZE;	/* We want it in bytes now */
 		startblock += mydata->fat_sect;	/* Offset from start of disk */
@@ -488,7 +487,7 @@ static dir_entry *get_dentfromdir (fsdata * mydata, int startsect,
 				   char *filename, dir_entry * retdent,
 				   int dols)
 {
-
+	return NULL;
 }
 
 #if 0
@@ -638,7 +637,7 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 
 	/* Terminate fs_type string. Writing past the end of vistart
 	   is ok - it's just the buffer. */
-	vistart->fs_type[8] = '\0';
+	vistart->fs_type[7] = '\0';
 
 	if (*fatsize == 32) {
 		if (compare_sign(FAT32_SIGN, vistart->fs_type) == 0) {
@@ -663,8 +662,8 @@ read_bootsectandvi(boot_sector *bs, volume_info *volinfo, int *fatsize)
 __u8 do_fat_read_block[MAX_CLUSTSIZE];  /* Block buffer */
 #endif
 
-__u8 *fnamecopy = 0x80500000;
-__u8 *do_fat_read_block = 0x80500880;
+__u8 *fnamecopy = (__u8 *)0x80500000;
+__u8 *do_fat_read_block = (__u8 *)0x80500880;
 
 boot_sector bs;
 volume_info volinfo;
@@ -724,18 +723,18 @@ do_fat_read(const char *filename, void *buffer, unsigned long maxsize,
     while (ISDIRDELIM (*filename))
 	filename++;
     /* Make a copy of the filename and convert it to lowercase */
-    strcpy (fnamecopy, filename);
-    downcase (fnamecopy);
+    strcpy((char *)fnamecopy, filename);
+    downcase((char *)fnamecopy);
     if (*fnamecopy == '\0') {
 	if (!dols){
 		printf("\n not there\n");
 	    return -1;
 	}
 	dols = LS_ROOT;
-    } else if ((idx = dirdelim (fnamecopy)) >= 0) {
+    } else if((idx = dirdelim((char *)fnamecopy)) >= 0) {
 	isdir = 1;
 	fnamecopy[idx] = '\0';
-	subname = fnamecopy + idx + 1;
+	subname = (char *)fnamecopy + idx + 1;
 	/* Handle multiple delimiters */
 	while (ISDIRDELIM (*subname))
 	    subname++;
@@ -805,7 +804,8 @@ do_fat_read(const char *filename, void *buffer, unsigned long maxsize,
 		dentptr++;
 		continue;
 	    }
-	    if (strcmp (fnamecopy, s_name) && strcmp (fnamecopy, l_name)) {
+	    if (strcmp((char *)fnamecopy, s_name) &&
+		strcmp((char *)fnamecopy, l_name)) {
 		FAT_DPRINT ("RootMismatch: |%s|%s|\n", s_name, l_name);
 		dentptr++;
 		continue;

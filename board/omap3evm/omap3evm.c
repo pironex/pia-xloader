@@ -47,10 +47,13 @@ typedef struct dpll_param dpll_param;
 #define MAX_SIL_INDEX	3
 
 /* Following functions are exported from lowlevel_init.S */
-extern dpll_param * get_mpu_dpll_param();
-extern dpll_param * get_iva_dpll_param();
-extern dpll_param * get_core_dpll_param();
-extern dpll_param * get_per_dpll_param();
+extern dpll_param *get_mpu_dpll_param(void);
+extern dpll_param *get_iva_dpll_param(void);
+extern dpll_param *get_core_dpll_param(void);
+extern dpll_param *get_per_dpll_param(void);
+
+extern int mmc_init(int verbose);
+extern block_dev_desc_t *mmc_get_dev(int dev);
 
 #define __raw_readl(a)    (*(volatile unsigned int *)(a))
 #define __raw_writel(v,a) (*(volatile unsigned int *)(a) = (v))
