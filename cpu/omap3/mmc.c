@@ -425,7 +425,7 @@ unsigned char configure_mmc(mmc_card_data *mmc_card_cur)
 	unsigned int trans_fact, trans_unit, retries = 2;
 	unsigned int max_dtr;
 	int dsor;
-	mmc_csd_reg_t Card_CSD;
+	volatile mmc_csd_reg_t Card_CSD;
 	unsigned char trans_speed;
 
 	mmc_init_setup();
