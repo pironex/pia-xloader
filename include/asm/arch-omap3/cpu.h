@@ -24,7 +24,11 @@
 
 #ifndef _OMAP34XX_CPU_H
 #define  _OMAP34XX_CPU_H
+#if defined (CONFIG_OMAP3517EVM)
+#include <asm/arch/omap3.h>
+#elif defined (CONFIG_OMAP3430)
 #include <asm/arch/omap3430.h>
+#endif
 
 /* Register offsets of common modules */
 /* Control */
@@ -46,7 +50,7 @@
 #define GP_DEVICE		0x3
 
 /* We are not concerned with BIT5 as it only determines
- *  the prirotiy between memory or perpheral booting 
+ *  the prirotiy between memory or perpheral booting
  */
 #define SYSBOOT_MASK		(BIT0|BIT1|BIT2|BIT3|BIT4)
 
@@ -141,6 +145,27 @@
 #define SOFTRESET		BIT1
 #define SMART_IDLE		(0x2 << 3)
 #define REF_ON_IDLE		(0x1 << 6)
+
+/* EMIF4 register */
+#define	EMIF4_BASE		OMAP34XX_SDRC_BASE
+#define	EMIF4_MOD_ID		(EMIF4_BASE + 0x00)
+#define	EMIF4_SDRAM_STS		(EMIF4_BASE + 0x04)
+#define	EMIF4_SDRAM_CFG		(EMIF4_BASE + 0x08)
+#define	EMIF4_SDRAM_RFCR	(EMIF4_BASE + 0x10)
+#define	EMIF4_SDRAM_RFCR_SHDW	(EMIF4_BASE + 0x14)
+#define	EMIF4_SDRAM_TIM1	(EMIF4_BASE + 0x18)
+#define	EMIF4_SDRAM_TIM1_SHDW	(EMIF4_BASE + 0x1C)
+#define	EMIF4_SDRAM_TIM2	(EMIF4_BASE + 0x20)
+#define	EMIF4_SDRAM_TIM2_SHDW	(EMIF4_BASE + 0x24)
+#define	EMIF4_SDRAM_TIM3	(EMIF4_BASE + 0x28)
+#define	EMIF4_SDRAM_TIM3_SHDW	(EMIF4_BASE + 0x2c)
+#define	EMIF4_PWR_MGT_CTRL	(EMIF4_BASE + 0x38)
+#define	EMIF4_PWR_MGT_CTRL_SHDW	(EMIF4_BASE + 0x3C)
+#define	EMIF4_IODFT_TLGC	(EMIF4_BASE + 0x60)
+#define	EMIF4_DDR_PHYCTL1	(EMIF4_BASE + 0xE4)
+#define	EMIF4_DDR_PHYCTL1_SHDW	(EMIF4_BASE + 0xE8)
+#define	EMIF4_DDR_PHYCTL2	(EMIF4_BASE + 0xEC)
+
 
 /* timer regs offsets (32 bit regs) */
 #define TIDR			0x0      /* r */

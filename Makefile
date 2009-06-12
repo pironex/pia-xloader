@@ -62,7 +62,7 @@ endif
 # X-LOAD objects....order is important (i.e. start must be first)
 
 OBJS  = cpu/$(CPU)/start.o
- 
+
 
 LIBS += board/$(BOARDDIR)/lib$(BOARD).a
 LIBS += cpu/$(CPU)/lib$(CPU).a
@@ -75,7 +75,7 @@ LIBS += drivers/libdrivers.a
 # Add GCC lib
 PLATFORM_LIBS += -L $(shell dirname `$(CC) $(CFLAGS) -print-libgcc-file-name`) -lgcc
 
-SUBDIRS	=  
+SUBDIRS	=
 #########################################################################
 #########################################################################
 
@@ -83,20 +83,20 @@ ALL = x-load.bin System.map
 
 all:		$(ALL)
 
- 
+
 x-load.bin:	x-load
 		$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
- 
+
 x-load:	$(OBJS) $(LIBS) $(LDSCRIPT)
 		UNDEF_SYM=`$(OBJDUMP) -x $(LIBS) |sed  -n -e 's/.*\(__u_boot_cmd_.*\)/-u\1/p'|sort|uniq`;\
  		$(LD) $(LDFLAGS) $$UNDEF_SYM $(OBJS) \
 			--start-group $(LIBS) --end-group $(PLATFORM_LIBS) \
 			-Map x-load.map -o x-load
- 
+
 $(LIBS):
 		$(MAKE) -C `dirname $@`
 
-  
+
 System.map:	x-load
 		@$(NM) $< | \
 		grep -v '\(compiled\)\|\(\.o$$\)\|\( [aUw] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | \
@@ -147,8 +147,10 @@ omap3430labrador_config :    unconfig
 	@./mkconfig $(@:_config=) arm omap3 omap3430labrador
 
 omap3evm_config :	unconfig
-
 	@./mkconfig $(@:_config=) arm omap3 omap3evm
+
+omap3517evm_config :       unconfig
+	@./mkconfig $(@:_config=) arm omap3 omap3517evm
 
 #########################################################################
 
@@ -157,7 +159,7 @@ clean:
 		\( -name 'core' -o -name '*.bak' -o -name '*~' \
 		-o -name '*.o'  -o -name '*.a'  \) -print \
 		| xargs rm -f
- 
+
 clobber:	clean
 	find . -type f \
 		\( -name .depend -o -name '*.srec' -o -name '*.bin' \) \
@@ -165,7 +167,7 @@ clobber:	clean
 		| xargs rm -f
 	rm -f $(OBJS) *.bak tags TAGS
 	rm -fr *.*~
-	rm -f x-load x-load.map $(ALL) 
+	rm -f x-load x-load.map $(ALL)
 	rm -f include/asm/proc include/asm/arch
 
 mrproper \
