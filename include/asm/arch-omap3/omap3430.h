@@ -130,7 +130,7 @@
 #define ENHANCED_UI_EE_NAME		"750-2075"
 #endif
 
-#ifdef	CONFIG_OMAP3517EVM
+#if defined (CONFIG_OMAP3517EVM) || defined (CONFIG_OMAP3517TEB)
 /* EMIF 4 replaces SDRC in OMAP3517 for DDR */
 #define EMIF4_MOD_ID			0x00
 #define EMIF4_STATUS			0x04

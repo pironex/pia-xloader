@@ -3,7 +3,7 @@
  * Jian Zhang <jzhang@ti.com>
  *
  *  Samsung K9F1G08R0AQ0C NAND chip driver for an OMAP2420 board
- * 
+ *
  * This file is based on the following u-boot file:
  *	common/cmd_nand.c
  *
@@ -44,11 +44,11 @@
 #define MT29F1G_ID		0xa1  /* x8, 1GiB */
 #define MT29F2G_ID      0xba  /* x16, 2GiB */
 
-#define ADDR_COLUMN		1          
-#define ADDR_PAGE		2             
+#define ADDR_COLUMN		1
+#define ADDR_PAGE		2
 #define ADDR_COLUMN_PAGE	(ADDR_COLUMN | ADDR_PAGE)
 
-#define ADDR_OOB		(0x4 | ADDR_COLUMN_PAGE) 
+#define ADDR_OOB		(0x4 | ADDR_COLUMN_PAGE)
 
 #define PAGE_SIZE		2048
 #define OOB_SIZE		64
@@ -73,9 +73,9 @@ static int nand_read_page(u_char *buf, ulong page_addr);
 static int nand_read_oob(u_char * buf, ulong page_addr);
 
 /* JFFS2 large page layout for 3-byte ECC per 256 bytes ECC layout */
-/* This is the only SW ECC supported by u-boot. So to load u-boot 
+/* This is the only SW ECC supported by u-boot. So to load u-boot
  * this should be supported */
-static u_char ecc_pos[] = 
+static u_char ecc_pos[] =
 		{40, 41, 42, 43, 44, 45, 46, 47,
 		48, 49, 50, 51, 52, 53, 54, 55,
 		56, 57, 58, 59, 60, 61, 62, 63};
@@ -103,7 +103,7 @@ static int NanD_Command(unsigned char command)
 			ret_val = READ_NAND(NAND_ADDR);/* wait till ready */
   		} while((ret_val & 0x40) != 0x40);
  	}
- 	
+
 	NAND_WAIT_READY();
 	return 0;
 }
@@ -116,7 +116,7 @@ static int NanD_Address(unsigned int numbytes, unsigned long ofs)
 
  	NAND_CTL_SETALE(NAND_ADDR);
 
-	if (numbytes == ADDR_COLUMN || numbytes == ADDR_COLUMN_PAGE 
+	if (numbytes == ADDR_COLUMN || numbytes == ADDR_COLUMN_PAGE
 				|| numbytes == ADDR_OOB)
 	{
 		ushort col = ofs;
@@ -163,16 +163,16 @@ int nand_chip()
 
  	if (NanD_Command(NAND_CMD_RESET)) {
  		printf("Err: RESET\n");
- 		NAND_DISABLE_CE();   
+ 		NAND_DISABLE_CE();
 		return 1;
 	}
- 
+
  	if (NanD_Command(NAND_CMD_READID)) {
  		printf("Err: READID\n");
  		NAND_DISABLE_CE();
 		return 1;
  	}
- 
+
  	NanD_Address(ADDR_COLUMN, 0);
 
  	mfr = READ_NAND(NAND_ADDR);
@@ -181,7 +181,11 @@ int nand_chip()
 	NAND_DISABLE_CE();
 
 	if (get_cpu_rev() == CPU_3430_ES2)
+#if defined (CONFIG_OMAP34XX) || defined (CONFIG_OMAP3EVM)
 		return (mfr != MT29F1G_MFR || !(id == MT29F1G_ID || id == MT29F2G_ID));
+#elif defined (CONFIG_OMAP3517EVM) || defined (CONFIG_OMAP3517TEB)
+		return (mfr != MT29F1G_MFR && !(id == MT29F1G_ID || id == MT29F2G_ID));
+#endif
 	else
 	  	return (mfr != K9F1G08R0A_MFR || id != K9F1G08R0A_ID);
 }
@@ -189,14 +193,14 @@ int nand_chip()
 /* read a block data to buf
  * return 1 if the block is bad or ECC error can't be corrected for any page
  * return 0 on sucess
- */ 
+ */
 int nand_read_block(unsigned char *buf, ulong block_addr)
 {
 	int i, offset = 0;
 
 #ifdef ECC_CHECK_ENABLE
 	u16 oob_buf[OOB_SIZE >> 1];
- 	
+
 	/* check bad block */
 	/* 0th word in spare area needs be 0xff */
 	if (nand_read_oob((unsigned char *)oob_buf, block_addr)
@@ -233,7 +237,7 @@ static int nand_read_page(u_char *buf, ulong page_addr)
 	u_char *p;
 #endif
 
-	NAND_ENABLE_CE();   
+	NAND_ENABLE_CE();
 	NanD_Command(NAND_CMD_READ0);
 	NanD_Address(ADDR_COLUMN_PAGE, page_addr);
 	NanD_Command(NAND_CMD_READSTART);
@@ -247,7 +251,7 @@ static int nand_read_page(u_char *buf, ulong page_addr)
 		*p++ = READ_NAND(NAND_ADDR);
 		delay(10);
    	}
-	
+
 #ifdef ECC_CHECK_ENABLE
 	p = (u16 *)oob_buf;
         len = (bus_width == 16) ? OOB_SIZE >> 1 : OOB_SIZE;
@@ -275,7 +279,7 @@ static int nand_read_page(u_char *buf, ulong page_addr)
 		buf += 256;
 		page_addr += 256;
 	}
-#endif	
+#endif
 	return 0;
 }
 
@@ -304,7 +308,7 @@ static int nand_read_oob(u_char *buf, ulong page_addr)
 	delay(10000);
 	for (cntr = 0; cntr < len; cntr++)
 		*p++ = READ_NAND(NAND_ADDR);
-  
+
 	NAND_WAIT_READY();
 	NAND_DISABLE_CE();  /* set pin high */
 

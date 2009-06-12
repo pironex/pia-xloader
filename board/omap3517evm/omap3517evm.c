@@ -47,23 +47,23 @@ typedef struct dpll_param dpll_param;
 #define MAX_SIL_INDEX	3
 
 /* Definitions for EMIF4 configuration values */
-#define	EMIF4_TIM1_T_RP		0x4
-#define	EMIF4_TIM1_T_RCD	0x4
-#define	EMIF4_TIM1_T_WR		0x2
+#define	EMIF4_TIM1_T_RP		0x3
+#define	EMIF4_TIM1_T_RCD	0x3
+#define	EMIF4_TIM1_T_WR		0x3
 #define	EMIF4_TIM1_T_RAS	0x8
-#define	EMIF4_TIM1_T_RC		13
+#define	EMIF4_TIM1_T_RC		0xA
 #define	EMIF4_TIM1_T_RRD	0x2
 #define	EMIF4_TIM1_T_WTR	0x2
 
 #define	EMIF4_TIM2_T_XP		0x2
 #define	EMIF4_TIM2_T_ODT	0x0
-#define	EMIF4_TIM2_T_XSNR	28
-#define	EMIF4_TIM2_T_XSRD	200
-#define	EMIF4_TIM2_T_RTP	0x2
-#define	EMIF4_TIM2_T_CKE	0x3
+#define	EMIF4_TIM2_T_XSNR	0x1C
+#define	EMIF4_TIM2_T_XSRD	0xC8
+#define	EMIF4_TIM2_T_RTP	0x1
+#define	EMIF4_TIM2_T_CKE	0x2
 
 #define	EMIF4_TIM3_T_TDQSCKMAX	0x0
-#define	EMIF4_TIM3_T_RFC	33
+#define	EMIF4_TIM3_T_RFC	0x25
 #define	EMIF4_TIM3_T_RAS_MAX	0x7
 
 #define	EMIF4_PWR_IDLE		0x2
@@ -73,8 +73,11 @@ typedef struct dpll_param dpll_param;
 
 #define	EMIF4_INITREF_DIS	0x0
 #define	EMIF4_PASR		0x0
-#define	EMIF4_REFRESH_RATE	1295
+#define	EMIF4_REFRESH_RATE	0x50F
 
+/*
+ * SDRAM Config register
+ */
 #define	EMIF4_CFG_SDRAM_TYP	0x2
 #define	EMIF4_CFG_IBANK_POS	0x0
 #define	EMIF4_CFG_DDR_TERM	0x0
@@ -84,19 +87,25 @@ typedef struct dpll_param dpll_param;
 #define	EMIF4_CFG_SDR_DRV	0x0
 #define	EMIF4_CFG_CWL		0x0
 #define	EMIF4_CFG_NARROW_MD	0x0
-#define	EMIF4_CFG_CL		0x3
-#define	EMIF4_CFG_ROWSIZE	0x3
+#define	EMIF4_CFG_CL		0x5
+#define	EMIF4_CFG_ROWSIZE	0x0
 #define	EMIF4_CFG_IBANK		0x3
 #define	EMIF4_CFG_EBANK		0x0
 #define	EMIF4_CFG_PGSIZE	0x2
 
-#define EMIF4_DDR1_RD_LAT	0x3
-#define	EMIF4_DDR1_PWRDN_DIS	0x0
-#define EMIF4_DDR1_STRBEN_EXT	0x0
+/*
+ * EMIF4 PHY Control 1 register configuration
+ */
+#define EMIF4_DDR1_RD_LAT	0x6
+#define	EMIF4_DDR1_PWRDN_DIS	0x1
+#define EMIF4_DDR1_STRBEN_EXT	0x1
 #define EMIF4_DDR1_DLL_MODE	0x0
 #define EMIF4_DDR1_VTP_DYN	0x1
 #define EMIF4_DDR1_LB_CK_SEL	0x0
 
+/*
+ * EMIF4 PHY Control 2 register configuration
+ */
 #define EMIF4_DDR2_TX_DATA_ALIGN	0x0
 #define EMIF4_DDR2_RX_DLL_BYPASS	0x0
 
@@ -262,8 +271,12 @@ void config_emif4_ddr(void)
 
 	/* Reset the DDR PHY and wait till completed */
 	sr32(EMIF4_IODFT_TLGC, 10, 1, 1);
-	while ((__raw_readl(EMIF4_SDRAM_STS) & BIT10) == 0x0);
+	/*Wait till that bit clears*/
+	while ((__raw_readl(EMIF4_IODFT_TLGC) & BIT10) == 0x1);
+	/*Re-verify the DDR PHY status*/
+	while ((__raw_readl(EMIF4_SDRAM_STS) & BIT2) == 0x0);
 
+	sr32(EMIF4_IODFT_TLGC, 0, 1, 1);
 	/* Set SDR timing registers */
 	regval = (EMIF4_TIM1_T_WTR | (EMIF4_TIM1_T_RRD << 3) |
 		(EMIF4_TIM1_T_RC << 6) | (EMIF4_TIM1_T_RAS << 12) |
@@ -467,21 +480,6 @@ void prcm_init(void)
 	sr32(CM_CLKEN_PLL_MPU, 0, 3, PLL_LOCK); /* lock mode */
 	wait_on_value(BIT0, 1, CM_IDLEST_PLL_MPU, LDELAY);
 
-#if 0
-	/* Getting the base address to IVA DPLL param table*/
-	dpll_param_p = (dpll_param *)get_iva_dpll_param();
-	/* Moving it to the right sysclk and ES rev base */
-	dpll_param_p = dpll_param_p + 2*clk_index + sil_index;
-	/* IVA DPLL (set to 12*20=240MHz) */
-	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_STOP);
-	wait_on_value(BIT0, 0, CM_IDLEST_PLL_IVA2, LDELAY);
-	sr32(CM_CLKSEL2_PLL_IVA2, 0, 5, dpll_param_p->m2);	/* set M2 */
-	sr32(CM_CLKSEL1_PLL_IVA2, 8, 11, dpll_param_p->m);	/* set M */
-  	sr32(CM_CLKSEL1_PLL_IVA2, 0, 7, dpll_param_p->n);	/* set N */
-	sr32(CM_CLKEN_PLL_IVA2, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
-	sr32(CM_CLKEN_PLL_IVA2, 0, 3, PLL_LOCK);	/* lock mode */
-	wait_on_value(BIT0, 1, CM_IDLEST_PLL_IVA2, LDELAY);
-#endif
 	/* Set up GPTimers to sys_clk source only */
  	sr32(CM_CLKSEL_PER, 0, 8, 0xff);
 	sr32(CM_CLKSEL_WKUP, 0, 1, 1);
@@ -648,6 +646,14 @@ void per_clocks_enable(void)
 	sr32(CM_FCLKEN1_CORE, 14, 1, 0x1);
 	sr32(CM_ICLKEN1_CORE, 14, 1, 0x1);
 #endif
+	/* Enable MMC1 clocks */
+	sr32(CM_FCLKEN1_CORE, 24, 1, 0x1);
+	sr32(CM_ICLKEN1_CORE, 24, 1, 0x1);
+
+	/* Enable MMC2 clocks */
+	sr32(CM_FCLKEN1_CORE, 25, 1, 0x1);
+	sr32(CM_ICLKEN1_CORE, 25, 1, 0x1);
+
 	delay(1000);
 }
 
@@ -705,6 +711,8 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(SDRC_DQS1),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS1*/\
 	MUX_VAL(CP(SDRC_DQS2),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS2*/\
 	MUX_VAL(CP(SDRC_DQS3),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS3*/\
+	MUX_VAL(CP(sdrc_cke0),      (IEN  | PTD | EN  | M0)) /*SDRC_CKE0*/\
+	MUX_VAL(CP(sdrc_cke1),      (IEN  | PTU | EN  | M0)) /*SDRC_CKE1*/\
 	MUX_VAL(CP(GPMC_A1),        (IDIS | PTD | DIS | M0)) /*GPMC_A1*/\
 	MUX_VAL(CP(GPMC_A2),        (IDIS | PTD | DIS | M0)) /*GPMC_A2*/\
 	MUX_VAL(CP(GPMC_A3),        (IDIS | PTD | DIS | M0)) /*GPMC_A3*/\

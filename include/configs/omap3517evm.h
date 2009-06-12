@@ -37,7 +37,8 @@
 #define CONFIG_ARMCORTEXA8       1    /* This is an ARM V7 CPU core */
 #define CONFIG_OMAP              1    /* in a TI OMAP core */
 
-#define CONFIG_OMAP3517EVM       1    /* working with OMAP3517 EVM */
+//#define CONFIG_OMAP3517EVM       1    /* working with OMAP3517 EVM */
+#define CONFIG_OMAP3517TEB       1    /* working with OMAP3517 TEB */
 
 /* Enable the below macro if MMC boot support is required */
 #define CONFIG_MMC               1
@@ -76,13 +77,13 @@
 #define CFG_NS16550_SERIAL
 #define CFG_NS16550_REG_SIZE     (-4)
 #define CFG_NS16550_CLK          (48000000)
-#define CFG_NS16550_COM2         OMAP34XX_UART2
+#define CFG_NS16550_COM1         OMAP34XX_UART1
 
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL1           2    /* UART1 on OMAP3EVM */
-#define CONFIG_CONS_INDEX        2
+#define CONFIG_SERIAL1           1    /* UART1 on OMAP3EVM */
+#define CONFIG_CONS_INDEX        1
 
 #define CONFIG_BAUDRATE          115200
 #define CFG_PBSIZE               256
@@ -108,7 +109,7 @@
  */
 
 #define CFG_NAND_K9F1G08R0A    /* Samsung 8-bit 128MB chip large page NAND chip*/
-#define NAND_16BIT
+#define NAND_8BIT
 
 /* NAND is partitioned:
  * 0x00000000 - 0x0007FFFF  Booting Image
@@ -122,9 +123,16 @@
 #define NAND_BLOCK_SIZE          0x20000
 
 #define GPMC_CONFIG              (OMAP34XX_GPMC_BASE+0x50)
+
+#if defined (CONFIG_OMAP34xx) || (CONFIG_OMAP3517EVM)
 #define GPMC_NAND_COMMAND_0      (OMAP34XX_GPMC_BASE+0x7C)
 #define GPMC_NAND_ADDRESS_0      (OMAP34XX_GPMC_BASE+0x80)
 #define GPMC_NAND_DATA_0         (OMAP34XX_GPMC_BASE+0x84)
+#elif defined (CONFIG_OMAP3517TEB)
+#define GPMC_NAND_COMMAND_0      (OMAP34XX_GPMC_BASE+0xDC)
+#define GPMC_NAND_ADDRESS_0      (OMAP34XX_GPMC_BASE+0xE0)
+#define GPMC_NAND_DATA_0         (OMAP34XX_GPMC_BASE+0xE4)
+#endif
 
 #ifdef NAND_16BIT
 #define WRITE_NAND_COMMAND(d, adr) \
