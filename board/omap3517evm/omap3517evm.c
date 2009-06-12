@@ -259,6 +259,7 @@ u32 wait_on_value(u32 read_bit_mask, u32 match_value, u32 read_addr, u32 bound)
 void config_emif4_ddr(void)
 {
 	unsigned int regval;
+
 	/* Set the DDR PHY parameters in PHY ctrl registers */
 	regval = (EMIF4_DDR1_RD_LAT | (EMIF4_DDR1_PWRDN_DIS << 6) |
 		(EMIF4_DDR1_STRBEN_EXT << 7) | (EMIF4_DDR1_DLL_MODE << 12) |
@@ -440,11 +441,8 @@ void prcm_init(void)
 	sr32(CM_CLKSEL1_PLL, 16, 11, dpll_param_p->m);	/* Set M */
 	sr32(CM_CLKSEL1_PLL, 8, 7, dpll_param_p->n);	/* Set N */
 	sr32(CM_CLKSEL1_PLL, 6, 1, 0);			/* 96M Src */
-	sr32(CM_CLKSEL_CORE, 8, 4, CORE_SSI_DIV);	/* ssi */
-	sr32(CM_CLKSEL_CORE, 4, 2, CORE_FUSB_DIV);	/* fsusb */
 	sr32(CM_CLKSEL_CORE, 2, 2, CORE_L4_DIV);	/* l4 */
 	sr32(CM_CLKSEL_CORE, 0, 2, CORE_L3_DIV);	/* l3 */
-	sr32(CM_CLKSEL_GFX, 0, 3, GFX_DIV);		/* gfx */
 	sr32(CM_CLKSEL_WKUP, 1, 2, WKUP_RSM);		/* reset mgr */
 	sr32(CM_CLKEN_PLL, 4, 4, dpll_param_p->fsel);	/* FREQSEL */
 	sr32(CM_CLKEN_PLL, 0, 3, PLL_LOCK);		/* lock mode */
@@ -513,12 +511,6 @@ void secure_unlock(void)
 	__raw_writel(UNLOCK_3, OCM_WRITE_PERMISSION_0);
 	__raw_writel(UNLOCK_2, OCM_ADDR_MATCH_2);
 
-#if 0
-	/* IVA Changes */
-	__raw_writel(UNLOCK_3, IVA2_REQ_INFO_PERMISSION_0);
-	__raw_writel(UNLOCK_3, IVA2_READ_PERMISSION_0);
-	__raw_writel(UNLOCK_3, IVA2_WRITE_PERMISSION_0);
-#endif
 	__raw_writel(UNLOCK_1, SMS_RG_ATT0); /* SDRC region 0 public */
 }
 
@@ -645,6 +637,10 @@ void per_clocks_enable(void)
 	/* Enable UART2 clocks */
 	sr32(CM_FCLKEN1_CORE, 14, 1, 0x1);
 	sr32(CM_ICLKEN1_CORE, 14, 1, 0x1);
+
+	/* Enable UART2 clocks */
+	sr32(CM_FCLKEN_PER, 11, 1, 0x1);
+	sr32(CM_ICLKEN_PER, 11, 1, 0x1);
 #endif
 	/* Enable MMC1 clocks */
 	sr32(CM_FCLKEN1_CORE, 24, 1, 0x1);
@@ -711,8 +707,8 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(SDRC_DQS1),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS1*/\
 	MUX_VAL(CP(SDRC_DQS2),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS2*/\
 	MUX_VAL(CP(SDRC_DQS3),      (IEN  | PTD | DIS | M0)) /*SDRC_DQS3*/\
-	MUX_VAL(CP(sdrc_cke0),      (IEN  | PTD | EN  | M0)) /*SDRC_CKE0*/\
-	MUX_VAL(CP(sdrc_cke1),      (IEN  | PTU | EN  | M0)) /*SDRC_CKE1*/\
+	MUX_VAL(CP(sdrc_cke0),      (M0)) /*SDRC_CKE0*/\
+	MUX_VAL(CP(sdrc_cke1),      (M0)) /*SDRC_CKE1*/\
 	MUX_VAL(CP(GPMC_A1),        (IDIS | PTD | DIS | M0)) /*GPMC_A1*/\
 	MUX_VAL(CP(GPMC_A2),        (IDIS | PTD | DIS | M0)) /*GPMC_A2*/\
 	MUX_VAL(CP(GPMC_A3),        (IDIS | PTD | DIS | M0)) /*GPMC_A3*/\
@@ -763,10 +759,21 @@ void per_clocks_enable(void)
 	MUX_VAL(CP(DSS_DATA20),     (IEN  | PTD | DIS | M4)) /*GPIO_90*/\
 	MUX_VAL(CP(DSS_DATA21),     (IEN  | PTD | DIS | M4)) /*GPIO_91*/\
 	MUX_VAL(CP(CAM_WEN),        (IEN  | PTD | DIS | M4)) /*GPIO_167*/\
-	MUX_VAL(CP(UART1_TX),       (IDIS | PTD | DIS | M0)) /*UART1_TX*/\
-	MUX_VAL(CP(UART1_RTS),      (IDIS | PTD | DIS | M0)) /*UART1_RTS*/\
-	MUX_VAL(CP(UART1_CTS),      (IEN | PTU | DIS | M0)) /*UART1_CTS*/\
-	MUX_VAL(CP(UART1_RX),       (IEN | PTD | DIS | M0)) /*UART1_RX*/\
+	MUX_VAL(CP(UART3_TX_IRTX),       (IDIS | PTD | DIS | M0)) /*UART1_TX*/\
+	MUX_VAL(CP(UART3_RTS_SD),      (IDIS | PTD | DIS | M0)) /*UART1_RTS*/\
+	MUX_VAL(CP(UART3_CTS_RCTX),      (IEN | PTU | DIS | M0)) /*UART1_CTS*/\
+	MUX_VAL(CP(UART3_RX_IRRX),       (IEN | PTD | DIS | M0)) /*UART1_RX*/\
+	/*Expansion card  */\
+	MUX_VAL(CP(MMC1_CLK),          (IEN  | PTU | EN  | M0)) /*MMC1_CLK*/\
+	MUX_VAL(CP(MMC1_CMD),          (IEN  | PTU | DIS | M0)) /*MMC1_CMD*/\
+	MUX_VAL(CP(MMC1_DAT0),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT0*/\
+	MUX_VAL(CP(MMC1_DAT1),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT1*/\
+	MUX_VAL(CP(MMC1_DAT2),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT2*/\
+	MUX_VAL(CP(MMC1_DAT3),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT3*/\
+	MUX_VAL(CP(MMC1_DAT4),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT4*/\
+	MUX_VAL(CP(MMC1_DAT5),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT5*/\
+	MUX_VAL(CP(MMC1_DAT6),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT6*/\
+	MUX_VAL(CP(MMC1_DAT7),         (IEN  | PTU | DIS | M0)) /*MMC1_DAT7*/\
 	MUX_VAL(CP(McBSP1_DX),      (IEN  | PTD | DIS | M4)) /*GPIO_158*/\
 	MUX_VAL(CP(SYS_32K),        (IEN  | PTD | DIS | M0)) /*SYS_32K*/\
 	MUX_VAL(CP(SYS_BOOT0),      (IEN  | PTD | DIS | M4)) /*GPIO_2 */\

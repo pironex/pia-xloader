@@ -68,6 +68,7 @@ void start_armboot (void)
 
 	buf =  (uchar*) CFG_LOADADDR;
 
+#if defined (CONFIG_OMAP34XX)
 	if ((get_mem_type() == MMC_ONENAND) || (get_mem_type() == MMC_NAND)){
 		buf += mmc_boot(buf);
 	}
@@ -85,7 +86,18 @@ void start_armboot (void)
         			buf += NAND_BLOCK_SIZE; /* advance buf ptr */
         	}
 	}
+#elif defined (CONFIG_OMAP3517EVM)
+	if (get_mem_type() == GPMC_NAND){
+		buf += mmc_boot(buf);
+	}
 
+	if (buf == (uchar *)CFG_LOADADDR){
+		for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
+			if (!nand_read_block(buf, i))
+				buf += NAND_BLOCK_SIZE; /* advance buf ptr */
+		}
+	}
+#endif
 
 
 	if (buf == (uchar *)CFG_LOADADDR)

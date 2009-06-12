@@ -37,8 +37,8 @@
 #define CONFIG_ARMCORTEXA8       1    /* This is an ARM V7 CPU core */
 #define CONFIG_OMAP              1    /* in a TI OMAP core */
 
-//#define CONFIG_OMAP3517EVM       1    /* working with OMAP3517 EVM */
-#define CONFIG_OMAP3517TEB       1    /* working with OMAP3517 TEB */
+#define CONFIG_OMAP3517EVM       1    /* working with OMAP3517 EVM */
+//#define CONFIG_OMAP3517TEB       1    /* working with OMAP3517 TEB */
 
 /* Enable the below macro if MMC boot support is required */
 #define CONFIG_MMC               1
@@ -77,13 +77,13 @@
 #define CFG_NS16550_SERIAL
 #define CFG_NS16550_REG_SIZE     (-4)
 #define CFG_NS16550_CLK          (48000000)
-#define CFG_NS16550_COM1         OMAP34XX_UART1
+#define CFG_NS16550_COM3         OMAP34XX_UART3
 
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL1           1    /* UART1 on OMAP3EVM */
-#define CONFIG_CONS_INDEX        1
+#define CONFIG_SERIAL3           3    /* UART1 on OMAP3EVM */
+#define CONFIG_CONS_INDEX        3
 
 #define CONFIG_BAUDRATE          115200
 #define CFG_PBSIZE               256
@@ -109,7 +109,7 @@
  */
 
 #define CFG_NAND_K9F1G08R0A    /* Samsung 8-bit 128MB chip large page NAND chip*/
-#define NAND_8BIT
+#define NAND_16BIT
 
 /* NAND is partitioned:
  * 0x00000000 - 0x0007FFFF  Booting Image
