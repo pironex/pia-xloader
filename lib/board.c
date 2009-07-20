@@ -73,6 +73,8 @@ void start_armboot (void)
 #ifdef CONFIG_MMC
 	/* first try mmc */
 	buf += mmc_boot(buf);
+	if (buf != (uchar *)CFG_LOADADDR)
+		printf("Loading u-boot.bin from mmc\n");
 #endif
 
 	if (buf == (uchar *)CFG_LOADADDR) {
@@ -80,7 +82,7 @@ void start_armboot (void)
 #if !defined (CONFIG_OMAP3517EVM)
 		if (get_mem_type() == GPMC_ONENAND){
 #ifdef CFG_PRINTF
-       			printf("Booting from onenand . . .\n");
+			printf("Loading u-boot.bin from onenand\n");
 #endif
         		for (i = ONENAND_START_BLOCK; i < ONENAND_END_BLOCK; i++){
         			if (!onenand_read_block(buf, i))
@@ -90,7 +92,7 @@ void start_armboot (void)
 #endif
 		if (get_mem_type() == GPMC_NAND){
 #ifdef CFG_PRINTF
-       			printf("Booting from nand . . .\n");
+			printf("Loading u-boot.bin from nand\n");
 #endif
         		for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
         			if (!nand_read_block(buf, i))
