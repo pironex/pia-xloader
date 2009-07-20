@@ -70,10 +70,12 @@ void start_armboot (void)
 
 #if defined (CONFIG_OMAP34XX)
 	if ((get_mem_type() == MMC_ONENAND) || (get_mem_type() == MMC_NAND)){
+		printf("Booting from mmc . . .\n");
 		buf += mmc_boot(buf);
 	}
 
 	if (get_mem_type() == GPMC_ONENAND){
+		printf("Booting from onenand . . .\n");
         	for (i = ONENAND_START_BLOCK; i < ONENAND_END_BLOCK; i++){
         		if (!onenand_read_block(buf, i))
         			buf += ONENAND_BLOCK_SIZE;
@@ -81,6 +83,7 @@ void start_armboot (void)
 	}
 
 	if (get_mem_type() == GPMC_NAND){
+		printf("Booting from nand . . .\n");
         	for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
         		if (!nand_read_block(buf, i))
         			buf += NAND_BLOCK_SIZE; /* advance buf ptr */
@@ -88,10 +91,12 @@ void start_armboot (void)
 	}
 #elif defined (CONFIG_OMAP3517EVM)
 	if (get_mem_type() == GPMC_NAND){
+		printf("Booting from mmc . . .\n");
 		buf += mmc_boot(buf);
 	}
 
 	if (buf == (uchar *)CFG_LOADADDR){
+		printf("Booting from nand . . .\n");
 		for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
 			if (!nand_read_block(buf, i))
 				buf += NAND_BLOCK_SIZE; /* advance buf ptr */
