@@ -50,7 +50,7 @@ init_fnc_t *init_sequence[] = {
  	serial_init,		/* serial communications setup */
 	print_info,
 #endif
-   	nand_init,		/* board specific nand init */
+  	nand_init,		/* board specific nand init */
   	NULL,
 };
 
@@ -68,42 +68,34 @@ void start_armboot (void)
 
 	buf =  (uchar*) CFG_LOADADDR;
 
-#if defined (CONFIG_OMAP34XX)
-	if ((get_mem_type() == MMC_ONENAND) || (get_mem_type() == MMC_NAND)){
-		printf("Booting from mmc . . .\n");
-		buf += mmc_boot(buf);
-	}
-
-	if (get_mem_type() == GPMC_ONENAND){
-		printf("Booting from onenand . . .\n");
-        	for (i = ONENAND_START_BLOCK; i < ONENAND_END_BLOCK; i++){
-        		if (!onenand_read_block(buf, i))
-        			buf += ONENAND_BLOCK_SIZE;
-        	}
-	}
-
-	if (get_mem_type() == GPMC_NAND){
-		printf("Booting from nand . . .\n");
-        	for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
-        		if (!nand_read_block(buf, i))
-        			buf += NAND_BLOCK_SIZE; /* advance buf ptr */
-        	}
-	}
-#elif defined (CONFIG_OMAP3517EVM)
-	if (get_mem_type() == GPMC_NAND){
-		printf("Booting from mmc . . .\n");
-		buf += mmc_boot(buf);
-	}
-
-	if (buf == (uchar *)CFG_LOADADDR){
-		printf("Booting from nand . . .\n");
-		for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
-			if (!nand_read_block(buf, i))
-				buf += NAND_BLOCK_SIZE; /* advance buf ptr */
-		}
-	}
+#ifdef CONFIG_MMC
+	/* first try mmc */
+	buf += mmc_boot(buf);
 #endif
 
+	if (buf == (uchar *)CFG_LOADADDR) {
+		/* if no u-boot on mmc, try onenand and nand */
+#if !defined (CONFIG_OMAP3517EVM)
+		if (get_mem_type() == GPMC_ONENAND){
+#ifdef CFG_PRINTF
+       			printf("Booting from onenand . . .\n");
+#endif
+        		for (i = ONENAND_START_BLOCK; i < ONENAND_END_BLOCK; i++){
+        			if (!onenand_read_block(buf, i))
+        				buf += ONENAND_BLOCK_SIZE;
+        		}
+		}
+#endif
+		if (get_mem_type() == GPMC_NAND){
+#ifdef CFG_PRINTF
+       			printf("Booting from nand . . .\n");
+#endif
+        		for (i = NAND_UBOOT_START; i < NAND_UBOOT_END; i+= NAND_BLOCK_SIZE){
+        			if (!nand_read_block(buf, i))
+        				buf += NAND_BLOCK_SIZE; /* advance buf ptr */
+        		}
+		}
+	}
 
 	if (buf == (uchar *)CFG_LOADADDR)
 		hang();
