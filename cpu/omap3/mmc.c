@@ -46,8 +46,9 @@ block_dev_desc_t *mmc_get_dev(int dev)
 
 unsigned char mmc_board_init(void)
 {
-	unsigned int value = 0;
 #if defined (CONFIG_OMAP34XX)
+	unsigned int value = 0;
+
 	value = CONTROL_PBIAS_LITE;
 	CONTROL_PBIAS_LITE = value | (1 << 2) | (1 << 1) | (1 << 9);
 
