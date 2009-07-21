@@ -685,6 +685,12 @@ void per_clocks_enable(void)
 	sr32(CM_FCLKEN1_CORE, 13, 1, 0x1);
 	sr32(CM_ICLKEN1_CORE, 13, 1, 0x1);
 #endif
+
+#ifdef CONFIG_MMC
+	/* Enable MMC1 clocks */
+	sr32(CM_FCLKEN1_CORE, 24, 1, 0x1);
+	sr32(CM_ICLKEN1_CORE, 24, 1, 0x1);
+#endif
 	delay(1000);
 }
 
