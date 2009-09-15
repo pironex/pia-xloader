@@ -46,7 +46,7 @@ block_dev_desc_t *mmc_get_dev(int dev)
 
 unsigned char mmc_board_init(void)
 {
-#if defined (CONFIG_OMAP34XX)
+#if defined (CONFIG_OMAP34XX) && !defined (CONFIG_OMAP3517EVM)
 	unsigned int value = 0;
 
 	value = CONTROL_PBIAS_LITE;
