@@ -97,10 +97,10 @@ typedef struct dpll_param dpll_param;
  * EMIF4 PHY Control 1 register configuration
  */
 #define EMIF4_DDR1_RD_LAT	0x6
-#define	EMIF4_DDR1_PWRDN_DIS	0x1
+#define	EMIF4_DDR1_PWRDN_DIS	0x0
 #define EMIF4_DDR1_STRBEN_EXT	0x0
 #define EMIF4_DDR1_DLL_MODE	0x0
-#define EMIF4_DDR1_VTP_DYN	0x1
+#define EMIF4_DDR1_VTP_DYN	0x0
 #define EMIF4_DDR1_LB_CK_SEL	0x0
 
 /*
