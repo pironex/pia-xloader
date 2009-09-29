@@ -496,7 +496,7 @@ unsigned char configure_mmc(mmc_card_data *mmc_card_cur)
 		return ret_val;
 
 	/* get the card size in sectors */
-	ret_val = mmc_read_cardsize(mmc_card_cur, &Card_CSD);
+	ret_val = mmc_read_cardsize(mmc_card_cur, (mmc_csd_reg_t *)&Card_CSD);
 	if (ret_val != 1)
 		return ret_val;
 

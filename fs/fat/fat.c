@@ -184,7 +184,7 @@ static int
 compare_sign(char *str1, char *str2)
 {
 	char *end = str1+SIGNLEN;
-	
+
 	while (str1 != end) {
 		if (*str1 != *str2) {
 			return -1;
@@ -432,6 +432,7 @@ getit:
 
 
 #ifdef CONFIG_SUPPORT_VFAT
+#if 0
 /*
  * Extract the file name information from 'slotptr' into 'l_name',
  * starting at l_name[*idx].
@@ -460,7 +461,7 @@ slot2str(dir_slot *slotptr, char *l_name, int *idx)
 
 	return 0;
 }
-
+#endif
 /* Calculate short name checksum */
 static __u8
 mkcksum(const char *str)

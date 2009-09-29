@@ -33,6 +33,9 @@
 #include <common.h>
 #include <asm/arch/mem.h>
 
+extern int misc_init_r (void);
+extern u32 get_mem_type(void);
+
 #ifdef CFG_PRINTF
 int print_info(void)
 {
