@@ -24,7 +24,7 @@
 
 #ifndef _OMAP34XX_CPU_H
 #define  _OMAP34XX_CPU_H
-#if defined (CONFIG_OMAP3517EVM) || defined (CONFIG_OMAP3517TEB)
+#if defined (CONFIG_AM3517EVM) || defined (CONFIG_AM3517TEB)
 #include <asm/arch/omap3.h>
 #elif defined (CONFIG_OMAP3430)
 #include <asm/arch/omap3430.h>
@@ -63,9 +63,9 @@
 #define GPMC_CONFIG		(OMAP34XX_GPMC_BASE+0x50)
 #define GPMC_STATUS		(OMAP34XX_GPMC_BASE+0x54)
 
-#if defined (CONFIG_OMAP34XX) || defined (CONFIG_OMAP3517EVM)
+#if defined (CONFIG_OMAP34XX) || defined (CONFIG_AM3517EVM)
 #define GPMC_CONFIG_CS0		(OMAP34XX_GPMC_BASE+0x60)
-#elif defined (CONFIG_OMAP3517TEB)
+#elif defined (CONFIG_AM3517TEB)
 #define GPMC_CONFIG_CS0		(OMAP34XX_GPMC_BASE+0xC0)
 #endif
 

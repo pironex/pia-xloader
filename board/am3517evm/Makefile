@@ -27,7 +27,7 @@ include $(TOPDIR)/config.mk
 
 LIB	= lib$(BOARD).a
 
-OBJS	:= omap3517evm.o
+OBJS	:= am3517evm.o
 SOBJS	:= platform.o
 
 $(LIB):	$(OBJS) $(SOBJS)

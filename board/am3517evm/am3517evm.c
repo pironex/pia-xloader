@@ -236,7 +236,7 @@ u32 wait_on_value(u32 read_bit_mask, u32 match_value, u32 read_addr, u32 bound)
 }
 
 /*********************************************************************
- * config_emif4_ddr() - Init/Configure DDR on OMAP3517 EVM board.
+ * config_emif4_ddr() - Init/Configure DDR on AM3517 EVM board.
  *********************************************************************/
 void config_emif4_ddr(void)
 {

@@ -149,8 +149,8 @@ omap3430labrador_config :    unconfig
 omap3evm_config :	unconfig
 	@./mkconfig $(@:_config=) arm omap3 omap3evm
 
-omap3517evm_config :       unconfig
-	@./mkconfig $(@:_config=) arm omap3 omap3517evm
+am3517evm_config :       unconfig
+	@./mkconfig $(@:_config=) arm omap3 am3517evm
 
 #########################################################################
 

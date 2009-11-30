@@ -114,7 +114,7 @@
 #define LOW_LEVEL_SRAM_STACK		0x4020FFFC
 
 /*
- * TODO: Are they required for OMAP3517?
+ * TODO: Are they required for AM3517?
  */
 #if defined(CONFIG_3430SDP) || defined(CONFIG_OMAP3EVM)
 /* FPGA on Debug board.*/

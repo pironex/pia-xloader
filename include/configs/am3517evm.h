@@ -2,7 +2,7 @@
  * (C) Copyright 2009
  * Texas Instruments, <www.ti.com>
  * Manikandan Pillai<mani.pillai@ti.com>
- * X-Loader Configuation settings for the OMAP3517EVM board.
+ * X-Loader Configuation settings for the AM3517EVM board.
  *
  * Derived from /include/configs/omap3evm.h
  *
@@ -37,8 +37,8 @@
 #define CONFIG_ARMCORTEXA8       1    /* This is an ARM V7 CPU core */
 #define CONFIG_OMAP              1    /* in a TI OMAP core */
 
-#define CONFIG_OMAP3517EVM       1    /* working with OMAP3517 EVM */
-//#define CONFIG_OMAP3517TEB       1    /* working with OMAP3517 TEB */
+#define CONFIG_AM3517EVM       1    /* working with AM3517 EVM */
+//#define CONFIG_AM3517TEB       1    /* working with AM3517 TEB */
 
 /* Enable the below macro if MMC boot support is required */
 #define CONFIG_MMC               1
@@ -124,11 +124,11 @@
 
 #define GPMC_CONFIG              (OMAP34XX_GPMC_BASE+0x50)
 
-#if defined (CONFIG_OMAP3517EVM)
+#if defined (CONFIG_AM3517EVM)
 #define GPMC_NAND_COMMAND_0      (OMAP34XX_GPMC_BASE+0x7C)
 #define GPMC_NAND_ADDRESS_0      (OMAP34XX_GPMC_BASE+0x80)
 #define GPMC_NAND_DATA_0         (OMAP34XX_GPMC_BASE+0x84)
-#elif defined (CONFIG_OMAP3517TEB)
+#elif defined (CONFIG_AM3517TEB)
 #define GPMC_NAND_COMMAND_0      (OMAP34XX_GPMC_BASE+0xDC)
 #define GPMC_NAND_ADDRESS_0      (OMAP34XX_GPMC_BASE+0xE0)
 #define GPMC_NAND_DATA_0         (OMAP34XX_GPMC_BASE+0xE4)
