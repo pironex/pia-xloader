@@ -51,6 +51,7 @@ extern dpll_param *get_mpu_dpll_param(void);
 extern dpll_param *get_iva_dpll_param(void);
 extern dpll_param *get_core_dpll_param(void);
 extern dpll_param *get_per_dpll_param(void);
+extern dpll_param *get_36xx_per_dpll_param(void);
 
 extern int mmc_init(int verbose);
 extern block_dev_desc_t *mmc_get_dev(int dev);
@@ -162,6 +163,35 @@ u32 get_cpu_rev(void)
 
 }
 
+u32 is_cpu_family(void)
+{
+	u32 cpuid = 0, cpu_family = 0;
+	u16 hawkeye;
+
+	__asm__ __volatile__("mrc p15, 0, %0, c0, c0, 0":"=r"(cpuid));
+	if ((cpuid & 0xf) == 0x0) {
+		cpu_family = CPU_OMAP34XX;
+	} else {
+		cpuid = __raw_readl(OMAP34XX_CONTROL_ID);
+		hawkeye  = (cpuid >> HAWKEYE_SHIFT) & 0xffff;
+
+		switch (hawkeye) {
+			case HAWKEYE_OMAP34XX:
+				cpu_family = CPU_OMAP34XX;
+				break;
+			case HAWKEYE_AM35XX:
+				cpu_family = CPU_AM35XX;
+				break;
+			case HAWKEYE_OMAP36XX:
+				cpu_family = CPU_OMAP36XX;
+				break;
+			default:
+				cpu_family = CPU_OMAP34XX;
+				break;
+		}
+	}
+	return cpu_family;
+}
 /******************************************
  * cpu_is_3410(void) - returns true for 3410
  ******************************************/
@@ -252,8 +282,8 @@ u32 get_sdr_cs_size(u32 offset)
  *********************************************************************/
 void config_3430sdram_ddr(void)
 {
-	
-#ifndef CONFIG_DDR_256MB_STACKED 
+
+#ifndef CONFIG_DDR_256MB_STACKED
 	/* reset sdrc controller */
 	__raw_writel(SOFTRESET, SDRC_SYSCONFIG);
 	wait_on_value(BIT0, BIT0, SDRC_STATUS, 12000000);
@@ -296,47 +326,47 @@ void config_3430sdram_ddr(void)
          __raw_writel(SOFTRESET, SDRC_SYSCONFIG);
          wait_on_value(BIT0, BIT0, SDRC_STATUS, 12000000);
          __raw_writel(0, SDRC_SYSCONFIG);
- 
+
          /* setup sdrc to ball mux */
          __raw_writel(SDP_SDRC_SHARING, SDRC_SHARING);
- 
+
          /* SDRC put in weak */
  //        (*(unsigned int*)0x6D00008C) = 0x00000020;
- 
+
          /* SDRC_MCFG0 register */
          (*(unsigned int*)0x6D000080) = 0x02584099;//from Micron
- 
+
          /* SDRC_ACTIM_CTRLA0 register */
  //our value        (*(unsigned int*)0x6D00009c) = 0xa29db4c6;// for 166M
          (*(unsigned int*)0x6D00009c) = 0xaa9db4c6;// for 166M from rkw
- 
+
          /* SDRC_ACTIM_CTRLB0 register */
  //from micron   (*(unsigned int*)0x6D0000a0) = 0x12214;// for 166M
- 
+
  //        (*(unsigned int*)0x6D0000a0) = 0x00011417; our value
          (*(unsigned int*)0x6D0000a0) = 0x00011517;
- 
+
          /* SDRC_RFR_CTRL0 register */
  //from micron   (*(unsigned int*)0x6D0000a4) =0x54601; // for 166M
- 
+
          (*(unsigned int*)0x6D0000a4) =0x0004DC01;
- 
+
          /* Disble Power Down of CKE cuz of 1 CKE on combo part */
          (*(unsigned int*)0x6D000070) = 0x00000081;
- 
+
          /* SDRC_Manual command register */
          (*(unsigned int*)0x6D0000a8) = 0x00000000; // NOP command
          delay(5000);
          (*(unsigned int*)0x6D0000a8) = 0x00000001; // Precharge command
          (*(unsigned int*)0x6D0000a8) = 0x00000002; // Auto-refresh command
          (*(unsigned int*)0x6D0000a8) = 0x00000002; // Auto-refresh command
- 
+
          /* SDRC MR0 register */
          (*(int*)0x6D000084) = 0x00000032; // Burst length =4
          // CAS latency = 3
          // Write Burst = Read Burst
          // Serial Mode
- 
+
          /* SDRC DLLA control register */
          (*(unsigned int*)0x6D000060) = 0x0000A;
          delay(0x20000); // some delay
@@ -494,7 +524,10 @@ void prcm_init(void)
 	wait_on_value(BIT0, 1, CM_IDLEST_CKGEN, LDELAY);
 
 	/* Getting the base address to PER  DPLL param table*/
-	dpll_param_p = (dpll_param *)get_per_dpll_param();
+	if (is_cpu_family() == CPU_OMAP36XX)
+		dpll_param_p = (dpll_param *)get_36xx_per_dpll_param();
+	else
+		dpll_param_p = (dpll_param *)get_per_dpll_param();
 	/* Moving it to the right sysclk base */
 	dpll_param_p = dpll_param_p + clk_index;
 	/* PER DPLL */
