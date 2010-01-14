@@ -433,39 +433,52 @@ get_per_dpll_param:
 	adr r0, per_dpll_param
 	mov pc, lr
 
-/* 36xx PER DPLL values */
-per_36xx_dpll_param:
-/* 12MHz */
-.word 0x1B0
-.word 0x05
-.word 0x07
-.word 0x09
+/*
+ * Tables for 36x/37x devices
+ *
+ * (Populated for 13MHz only)
+ */
+mpu_36x_dpll_param:
+.word 300, 12, 0, 1
+.word 300, 12, 0, 1
+.word 300, 12, 0, 1
+.word 300, 12, 0, 1
 
-/* 13MHz */
-.word 0x360
-.word 0x0C
-.word 0x03
-.word 0x09
+iva_36x_dpll_param:
+.word 20, 0, 0, 1
+.word 20, 0, 0, 1
+.word 20, 0, 0, 1
+.word 20, 0, 0, 1
 
-/* 19.2MHz */
-.word 0x1C2
-.word 0x09
-.word 0x07
-.word 0x09
+core_36x_dpll_param:
+.word 400, 12, 0, 1
+.word 400, 12, 0, 1
+.word 400, 12, 0, 1
+.word 400, 12, 0, 1
 
-/* 26MHz */
-.word 0x1B0
-.word 0x0C
-.word 0x07
-.word 0x09
+per_36x_dpll_param:
+/*    SYSCLK    M       N       M2      M3      M4      M5      M6      m2DIV */
+.word 13000,    1728,   12,     9,      32,     18,     8,      6,      2
+.word 13000,    1728,   12,     9,      32,     18,     8,      6,      2
+.word 13000,    1728,   12,     9,      32,     18,     8,      6,      2
+.word 13000,    1728,   12,     9,      32,     18,     8,      6,      2
 
-/* 38.4MHz */
-.word 0x1C2
-.word 0x13
-.word 0x07
-.word 0x09
+.globl get_36x_mpu_dpll_param
+get_36x_mpu_dpll_param:
+	adr	r0, mpu_36x_dpll_param
+	mov	pc, lr
 
-.globl get_36xx_per_dpll_param
-get_36xx_per_dpll_param:
-	adr	r0, per_36xx_dpll_param
+.globl get_36x_iva_dpll_param
+get_36x_iva_dpll_param:
+	adr	r0, iva_36x_dpll_param
+	mov	pc, lr
+
+.globl get_36x_core_dpll_param
+get_36x_core_dpll_param:
+	adr	r0, core_36x_dpll_param
+	mov	pc, lr
+
+.globl get_36x_per_dpll_param
+get_36x_per_dpll_param:
+	adr	r0, per_36x_dpll_param
 	mov	pc, lr
