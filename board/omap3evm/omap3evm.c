@@ -414,12 +414,21 @@ void config_3430sdram_ddr(void)
  *************************************************************/
 u32 get_osc_clk_speed(void)
 {
-	u32 start, cstart, cend, cdiff, val;
+	u32 start, cstart, cend, cdiff, cdiv, val;
 
 	val = __raw_readl(PRM_CLKSRC_CTRL);
-	/* If SYS_CLK is being divided by 2, remove for now */
-	val = (val & (~BIT7)) | BIT6;
-	__raw_writel(val, PRM_CLKSRC_CTRL);
+
+	if (val & BIT7)
+		cdiv = 2;
+	else if (val & BIT6)
+		cdiv = 1;
+	else
+		/*
+		 * Should never reach here!
+		 * TBD: Add a WARN()/BUG()
+		 *      For now, assume divider as 1.
+		 */
+		cdiv = 1;
 
 	/* enable timer2 */
 	val = __raw_readl(CM_CLKSEL_WKUP) | BIT0;
@@ -442,6 +451,11 @@ u32 get_osc_clk_speed(void)
 	while (__raw_readl(S32K_CR) < (start + 20));	/* wait for 40 cycles */
 	cend = __raw_readl(OMAP34XX_GPT1 + TCRR);	/* get end sys_clk count */
 	cdiff = cend - cstart;				/* get elapsed ticks */
+
+	if (cdiv == 2)
+	{
+		cdiff *= 2;
+	}
 
 	/* based on number of ticks assign speed */
 	if (cdiff > 19000)
