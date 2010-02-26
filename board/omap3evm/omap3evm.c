@@ -529,7 +529,7 @@ static void dpll3_init_34xx(u32 sil_index, u32 clk_index)
 	sr32(CM_CLKSEL_CORE, 2, 2, CORE_L4_DIV);	/* l4 */
 	sr32(CM_CLKSEL_CORE, 0, 2, CORE_L3_DIV);	/* l3 */
 
-	sr32(CM_CLKSEL_GFX,  0, 3, GFX_DIV);		/* gfx */
+	sr32(CM_CLKSEL_GFX,  0, 3, GFX_DIV_34X);	/* gfx */
 	sr32(CM_CLKSEL_WKUP, 1, 2, WKUP_RSM);		/* reset mgr */
 
 	/* FREQSEL (CORE_DPLL_FREQSEL): CM_CLKEN_PLL[4:7] */
@@ -669,7 +669,7 @@ static void dpll3_init_36xx(u32 sil_index, u32 clk_index)
 	sr32(CM_CLKSEL_CORE, 2, 2, CORE_L4_DIV);	/* l4 */
 	sr32(CM_CLKSEL_CORE, 0, 2, CORE_L3_DIV);	/* l3 */
 
-	sr32(CM_CLKSEL_GFX,  0, 3, GFX_DIV);		/* gfx */
+	sr32(CM_CLKSEL_GFX,  0, 3, GFX_DIV_36X);		/* gfx */
 	sr32(CM_CLKSEL_WKUP, 1, 2, WKUP_RSM);		/* reset mgr */
 
 	/* FREQSEL (CORE_DPLL_FREQSEL): CM_CLKEN_PLL[4:7] */
