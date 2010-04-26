@@ -312,14 +312,20 @@ void config_3430sdram_ddr(void)
 	__raw_writel(SDP_SDRC_MDCFG_0_DDR, SDRC_MCFG_0);
 
 	/* set timing */
-	if ((get_mem_type() == GPMC_ONENAND) || (get_mem_type() == MMC_ONENAND)){
-        	__raw_writel(INFINEON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
-        	__raw_writel(INFINEON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
-	}
-	if ((get_mem_type() == GPMC_NAND) ||(get_mem_type() == MMC_NAND)){
-        	__raw_writel(MICRON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
-        	__raw_writel(MICRON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
-	}
+	if (is_cpu_family() == CPU_OMAP36XX) {
+		__raw_writel(HYNIX_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
+		__raw_writel(HYNIX_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
+
+	} else {
+		if ((get_mem_type() == GPMC_ONENAND) || (get_mem_type() == MMC_ONENAND)){
+			__raw_writel(INFINEON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
+			__raw_writel(INFINEON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
+		}
+		if ((get_mem_type() == GPMC_NAND) ||(get_mem_type() == MMC_NAND)){
+			__raw_writel(MICRON_SDRC_ACTIM_CTRLA_0, SDRC_ACTIM_CTRLA_0);
+			__raw_writel(MICRON_SDRC_ACTIM_CTRLB_0, SDRC_ACTIM_CTRLB_0);
+		}
+	 }
 
 	__raw_writel(SDP_SDRC_RFR_CTRL, SDRC_RFR_CTRL);
 	__raw_writel(SDP_SDRC_POWER_POP, SDRC_POWER);
@@ -346,24 +352,21 @@ void config_3430sdram_ddr(void)
          /* setup sdrc to ball mux */
          __raw_writel(SDP_SDRC_SHARING, SDRC_SHARING);
 
-         /* SDRC put in weak */
- //        (*(unsigned int*)0x6D00008C) = 0x00000020;
-
          /* SDRC_MCFG0 register */
          (*(unsigned int*)0x6D000080) = 0x02584099;//from Micron
 
-         /* SDRC_ACTIM_CTRLA0 register */
- //our value        (*(unsigned int*)0x6D00009c) = 0xa29db4c6;// for 166M
-         (*(unsigned int*)0x6D00009c) = 0xaa9db4c6;// for 166M from rkw
+	 if (is_cpu_family() == CPU_OMAP36XX) {
+		 /* SDRC_ACTIM_CTRLA0 register */
+		 (*(unsigned int*)0x6D00009c) = 0x92e1c4c6;// for 200M
+		 /* SDRC_ACTIM_CTRLB0 register */
+		 (*(unsigned int*)0x6D0000a0) = 0x0002211c;
+	 } else {
+		 /* SDRC_ACTIM_CTRLA0 register */
+		 (*(unsigned int*)0x6D00009c) = 0xaa9db4c6;// for 166M from rkw
+		 /* SDRC_ACTIM_CTRLB0 register */
+		 (*(unsigned int*)0x6D0000a0) = 0x00011517;
+	 }
 
-         /* SDRC_ACTIM_CTRLB0 register */
- //from micron   (*(unsigned int*)0x6D0000a0) = 0x12214;// for 166M
-
- //        (*(unsigned int*)0x6D0000a0) = 0x00011417; our value
-         (*(unsigned int*)0x6D0000a0) = 0x00011517;
-
-         /* SDRC_RFR_CTRL0 register */
- //from micron   (*(unsigned int*)0x6D0000a4) =0x54601; // for 166M
 
          (*(unsigned int*)0x6D0000a4) =0x0004DC01;
 
