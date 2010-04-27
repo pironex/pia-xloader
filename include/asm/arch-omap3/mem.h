@@ -248,7 +248,7 @@ typedef enum {
  *	TRFC		= 18
  *   ACTIMB
  *	TWTR		= 2
- *	TCKE		= 2
+ *	TCKE		= 1
  *	TXP		= 1
  *	TXSR		= 28
  */
@@ -266,7 +266,7 @@ typedef enum {
 			(HYNIX_TDPL_200 << 6) | (HYNIX_TDAL_200))
 
 #define HYNIX_TWTR_200	2
-#define HYNIX_TCKE_200	2
+#define HYNIX_TCKE_200	1
 #define HYNIX_TXP_200		1
 #define HYNIX_XSR_200		28
 #define HYNIX_V_ACTIMB_200	(((HYNIX_TCKE_200 << 12) | (HYNIX_XSR_200 << 0)) |	\

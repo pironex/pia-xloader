@@ -359,7 +359,7 @@ void config_3430sdram_ddr(void)
 		 /* SDRC_ACTIM_CTRLA0 register */
 		 (*(unsigned int*)0x6D00009c) = 0x92e1c4c6;// for 200M
 		 /* SDRC_ACTIM_CTRLB0 register */
-		 (*(unsigned int*)0x6D0000a0) = 0x0002211c;
+		 (*(unsigned int*)0x6D0000a0) = 0x0002111c;
 	 } else {
 		 /* SDRC_ACTIM_CTRLA0 register */
 		 (*(unsigned int*)0x6D00009c) = 0xaa9db4c6;// for 166M from rkw
