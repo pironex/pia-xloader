@@ -44,6 +44,9 @@
 #define MT29F1G_ID		0xa1  /* x8, 1GiB */
 #define MT29F2G_ID      0xba  /* x16, 2GiB */
 
+#define HYNIX4GiB_MFR		0xAD  /* Hynix */
+#define HYNIX4GiB_ID		0xBC  /* x16, 4GiB */
+
 #define ADDR_COLUMN		1
 #define ADDR_PAGE		2
 #define ADDR_COLUMN_PAGE	(ADDR_COLUMN | ADDR_PAGE)
@@ -180,14 +183,18 @@ int nand_chip()
 
 	NAND_DISABLE_CE();
 
-	if (get_cpu_rev() == CPU_3430_ES2)
+	if (is_cpu_family() == CPU_OMAP36XX) {
+		return (mfr != HYNIX4GiB_MFR || id != HYNIX4GiB_ID);
+	} else {
+		if (get_cpu_rev() == CPU_3430_ES2)
 #if defined (CONFIG_OMAP34XX) || defined (CONFIG_OMAP3EVM)
-		return (mfr != MT29F1G_MFR || !(id == MT29F1G_ID || id == MT29F2G_ID));
+			return (mfr != MT29F1G_MFR || !(id == MT29F1G_ID || id == MT29F2G_ID));
 #elif defined (CONFIG_AM3517EVM) || defined (CONFIG_AM3517TEB)
 		return (mfr != MT29F1G_MFR && !(id == MT29F1G_ID || id == MT29F2G_ID));
 #endif
-	else
-	  	return (mfr != K9F1G08R0A_MFR || id != K9F1G08R0A_ID);
+		else
+			return (mfr != K9F1G08R0A_MFR || id != K9F1G08R0A_ID);
+	}
 }
 
 /* read a block data to buf
