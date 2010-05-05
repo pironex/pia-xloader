@@ -144,6 +144,25 @@ int board_init (void)
 	return 0;
 }
 
+/* TODO: Move it to common place so that should be used
+ * for all OMAP series of devices
+ */
+u32 is_cpu_family(void)
+{
+	u32 cpuid = 0, cpu_family = 0;
+	u16 hawkeye;
+
+	cpuid = __raw_readl(OMAP34XX_CONTROL_ID);
+	hawkeye  = (cpuid >> HAWKEYE_SHIFT) & 0xffff;
+
+	switch (hawkeye) {
+	case HAWKEYE_AM35XX:
+	default:
+		cpu_family = CPU_AM35XX;
+		break;
+	}
+	return cpu_family;
+}
 /*************************************************************
  *  get_device_type(): tell if GP/HS/EMU/TST
  *************************************************************/
