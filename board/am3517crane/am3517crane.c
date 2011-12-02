@@ -201,6 +201,14 @@ void config_emif4_ddr(void)
 		;
 
 	sr32(EMIF4_IODFT_TLGC, 0, 1, 1);
+
+	/* VTP on */
+	regval = __raw_readl(EMIF4_DDR_PHYCTL1);
+	regval |= (1 << 15); // set VTP
+	__raw_writel(regval, EMIF4_DDR_PHYCTL1);
+	while ((__raw_readl(0x48002584) & BIT5) == 0x0)
+			;
+
 	/* Set SDR timing registers */
 	regval = (EMIF4_TIM1_T_WTR | (EMIF4_TIM1_T_RRD << 3) |
 		(EMIF4_TIM1_T_RC << 6) | (EMIF4_TIM1_T_RAS << 12) |
