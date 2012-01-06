@@ -859,7 +859,11 @@ int mmc_boot(unsigned char *buf)
 
 	printf("\n%ld Bytes Read from MMC \n", size);
 
-	printf("Starting OS Bootloader from MMC...\n");
+	if (size != 0) {
+		printf("Starting OS Bootloader from MMC...\n");
+	} else {
+		printf("\n No Bootloader on MMC.\n");
+	}
 #endif
 	return size;
 }
