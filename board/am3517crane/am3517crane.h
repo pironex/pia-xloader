@@ -64,7 +64,11 @@
 #define	EMIF4_CFG_DDR2_DDQS	0x1
 #define	EMIF4_CFG_DYN_ODT	0x0
 #define	EMIF4_CFG_DDR_DIS_DLL	0x0
+#ifdef CFG_MEMREVG
 #define	EMIF4_CFG_SDR_DRV	0x0
+#else
+#define	EMIF4_CFG_SDR_DRV	0x1
+#endif
 #define	EMIF4_CFG_CWL		0x0
 #define	EMIF4_CFG_NARROW_MD	0x0
 #define	EMIF4_CFG_CL		0x5
@@ -122,7 +126,11 @@
 #define	EMIF4_CFG_DDR2_DDQS	0x1
 #define	EMIF4_CFG_DYN_ODT	0x0
 #define	EMIF4_CFG_DDR_DIS_DLL	0x0
+#ifdef CFG_MEMREVG
 #define	EMIF4_CFG_SDR_DRV	0x0
+#else
+#define	EMIF4_CFG_SDR_DRV	0x1
+#endif
 #define	EMIF4_CFG_CWL		0x0
 #define	EMIF4_CFG_NARROW_MD	0x0
 #define	EMIF4_CFG_CL		0x6

@@ -515,6 +515,13 @@ void s_init(void)
  ********************************************************/
 int misc_init_r(void)
 {
+#ifdef CFG_PRINTF
+#if (CFG_MEMREVG == 1)
+	printf("piA memory: Micron RevG\n");
+#else
+	printf("piA memory: Micron RevH\n");
+#endif
+#endif
 	return 0;
 }
 
