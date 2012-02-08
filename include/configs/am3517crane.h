@@ -71,6 +71,7 @@
 /* #define PRCM_CLK_CFG2_266MHZ   1   */ /* VDD2=1.15v - 133MHz DDR */
 #define PRCM_CLK_CFG2_332MHZ     1    /* VDD2=1.15v - 166MHz DDR */
 #define PRCM_PCLK_OPP2           1    /* ARM=381MHz - VDD1=1.20v */
+/*#define CFG_MEMREVG              1*/    /* Disable to set low drive strength */
 
 # define NAND_BASE_ADR           NAND_BASE  /* NAND flash */
 # define ONENAND_BASE            ONENAND_MAP  /* OneNand flash */
