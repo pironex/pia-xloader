@@ -58,16 +58,31 @@
 /*
  * SDRAM Config register
  */
+//#define CFG_DDR_DRV_REDUCED
+//#define CFG_DDR_STRB_EXT
+#ifdef CFG_DDR_DRV_REDUCED
+#define DDR_DRV (0x01)
+#else
+#define DDR_DRV (0x00)
+#endif
+
+#ifdef CFG_DDR_STRB_EXT
+#define DDR_STRBEN (0x01)
+#else
+#define DDR_STRBEN (0x00)
+#endif
+
+
 #define	EMIF4_CFG_SDRAM_TYP	0x2
 #define	EMIF4_CFG_IBANK_POS	0x0
-#define	EMIF4_CFG_DDR_TERM	0x0
-#define	EMIF4_CFG_DDR2_DDQS	0x1
+#define	EMIF4_CFG_DDR_TERM	0x0 // c002 0:0 Ohm, 1:75 Ohm, 2:150 Ohm
+#define	EMIF4_CFG_DDR2_DDQS	0x1 // 1:differential DQL enabled
 #define	EMIF4_CFG_DYN_ODT	0x0
 #define	EMIF4_CFG_DDR_DIS_DLL	0x0
 #ifdef CFG_MEMREVG
 #define	EMIF4_CFG_SDR_DRV	0x0
 #else
-#define	EMIF4_CFG_SDR_DRV	0x1
+#define	EMIF4_CFG_SDR_DRV	DDR_DRV
 #endif
 #define	EMIF4_CFG_CWL		0x0
 #define	EMIF4_CFG_NARROW_MD	0x0
@@ -81,8 +96,8 @@
  * EMIF4 PHY Control 1 register configuration
  */
 #define EMIF4_DDR1_RD_LAT	0x6
-#define	EMIF4_DDR1_PWRDN_DIS	0x0
-#define EMIF4_DDR1_STRBEN_EXT	0x0
+#define	EMIF4_DDR1_PWRDN_DIS	0x0  // .c001
+#define EMIF4_DDR1_STRBEN_EXT	DDR_STRBEN
 #define EMIF4_DDR1_DLL_MODE	0x0
 #define EMIF4_DDR1_VTP_DYN	0x0
 #define EMIF4_DDR1_LB_CK_SEL	0x0

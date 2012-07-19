@@ -177,9 +177,14 @@ u32 wait_on_value(u32 read_bit_mask, u32 match_value, u32 read_addr, u32 bound)
 /*********************************************************************
  * config_emif4_ddr() - Init/Configure DDR on AM3517 EVM board.
  *********************************************************************/
+#define CONTROL_DEVCONF3 (0x48002584)
 void config_emif4_ddr(void)
 {
 	unsigned int regval;
+
+	regval = __raw_readl(CONTROL_DEVCONF3);
+	regval |= 2; // full termination
+	__raw_writel(regval, CONTROL_DEVCONF3);
 
 	/* Set the DDR PHY parameters in PHY ctrl registers */
 	regval = (EMIF4_DDR1_RD_LAT | (EMIF4_DDR1_PWRDN_DIS << 6) |
@@ -206,8 +211,12 @@ void config_emif4_ddr(void)
 	regval = __raw_readl(EMIF4_DDR_PHYCTL1);
 	regval |= (1 << 15); // set VTP
 	__raw_writel(regval, EMIF4_DDR_PHYCTL1);
-	while ((__raw_readl(0x48002584) & BIT5) == 0x0)
-			;
+	__raw_writel(regval, EMIF4_DDR_PHYCTL1_SHDW);
+	while ((__raw_readl(CONTROL_DEVCONF3) & BIT5) == 0x0)
+		;
+	regval = regval & (0xffff & ~(1 << 15)); //VTP DYNAMIC OFF again
+	__raw_writel(regval, EMIF4_DDR_PHYCTL1);
+	__raw_writel(regval, EMIF4_DDR_PHYCTL1_SHDW);
 
 	/* Set SDR timing registers */
 	regval = (EMIF4_TIM1_T_WTR | (EMIF4_TIM1_T_RRD << 3) |
@@ -519,7 +528,7 @@ int misc_init_r(void)
 #if (CFG_MEMREVG == 1)
 	printf("piA memory: Micron RevG\n");
 #else
-	printf("piA memory: Micron RevH\n");
+	printf("piA memory: Micron: drv:%d\n", DDR_DRV);
 #endif
 #endif
 	return 0;
